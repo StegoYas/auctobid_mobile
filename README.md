@@ -1,9 +1,8 @@
 # AUCTOBID - Flutter Mobile App
 
 ![AUCTOBID Logo](assets/images/AUCTOBID-Logo.png)
-![AUCTOBID Favicon](assets/images/AUCTOBID-Favicon.png)
 
-**Aplikasi Mobile - Sistem Pelelangan Online dengan Tema Medieval Fantasy**
+**Aplikasi Mobile AUCTOBID - Sistem Pelelangan Online.**
 
 ---
 
@@ -15,22 +14,22 @@ AUCTOBID Mobile adalah aplikasi Flutter untuk pengguna masyarakat yang ingin men
 
 Medieval Fantasy dengan palet warna:
 
-- **Primary**: `#8B4513` (Saddle Brown)
-- **Secondary**: `#D4AF37` (Gold)
-- **Background**: `#FFF8DC` (Cornsilk/Parchment)
-- **Text**: `#2F4F4F` (Dark Slate)
-- **Font**: Google Fonts - Cinzel (heading), Merriweather (body)
+- **Primary**: `#8B4513` (Saddle Brown).
+- **Secondary**: `#D4AF37` (Gold).
+- **Background**: `#FFF8DC` (Cornsilk/Parchment).
+- **Text**: `#2F4F4F` (Dark Slate).
+- **Font**: Google Fonts - Cinzel (heading), Merriweather (body).
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Flutter 3.x
-- **State Management**: Provider
-- **HTTP Client**: Dio
-- **WebSocket**: web_socket_channel
-- **Secure Storage**: flutter_secure_storage
-- **Image Picker**: image_picker
+- **Framework**: Flutter 3.x.
+- **State Management**: Provider.
+- **HTTP Client**: Dio.
+- **WebSocket**: web_socket_channel.
+- **Secure Storage**: flutter_secure_storage.
+- **Image Picker**: image_picker.
 - **Fonts**: google_fonts
 
 ---
@@ -51,17 +50,17 @@ Aplikasi ini digunakan oleh **Masyarakat** untuk:
 
 ## 📋 Fitur Utama
 
-- ✅ Splash screen dengan animasi logo
-- ✅ Login & registrasi
-- ✅ Home dengan bottom navigation
-- ✅ Galeri gambar lelang
-- ✅ Real-time bidding via WebSocket
-- ✅ Submit barang dengan multi-image picker
-- ✅ Riwayat bid (semua/aktif/menang)
-- ✅ Pembayaran simulasi
-- ✅ Notifikasi push
-- ✅ Pengaturan profil
-- ✅ Edit profil dengan upload foto
+- ✔️ Splash screen dengan animasi logo.
+- ✔️ Login & registrasi.
+- ✔️ Home dengan bottom navigation.
+- ✔️ Galeri gambar lelang.
+- ✔️ Real-time bidding via WebSocket.
+- ✔️ Submit barang dengan multi-image picker.
+- ✔️ Riwayat bid (semua/aktif/menang).
+- ✔️ Pembayaran simulasi.
+- ✔️ Notifikasi push.
+- ✔️ Pengaturan profil.
+- ✔️ Edit profil dengan upload foto.
 
 ---
 
@@ -182,16 +181,16 @@ auctobid_mobile/
 
 Assets logo di folder `assets/images/`:
 
-- `AUCTOBID-Logo.png` - Logo utama
-- `AUCTOBID-Favicon.png` - Icon aplikasi
+- `AUCTOBID-Logo.png` - Logo utama.
+- `AUCTOBID-Favicon.png` - Icon aplikasi.
 
 ---
 
 ## ⚠️ Catatan Penting
 
-1. **Web Mode Only** - Aplikasi dijalankan di Chrome untuk development
-2. **Backend Required** - Pastikan Laravel backend sudah running
-3. **WebSocket** - Untuk real-time bidding, jalankan Reverb di backend
+1. **Web Mode Only** - Aplikasi dijalankan di Chrome untuk development.
+2. **Backend Required** - Pastikan Laravel backend sudah running.
+3. **WebSocket** - Untuk real-time bidding, jalankan Reverb di backend.
 
 ---
 
@@ -209,8 +208,8 @@ php artisan reverb:start --port=8080
 
 ## 📄 Lisensi
 
-Proyek ini dibuat untuk keperluan pendidikan TB Kelas 12.
+**© 2025 AUCTOBID - All rights reserved | Developed by StegoYas**
 
 ---
 
-**© 2024 AUCTOBID Team**
+![AUCTOBID Favicon](assets/images/AUCTOBID-Favicon.png)
