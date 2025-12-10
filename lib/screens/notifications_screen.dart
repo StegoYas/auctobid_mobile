@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../config/app_theme.dart';
 import '../providers/notification_provider.dart';
 import '../models/notification.dart';
+import '../widgets/parchment_background.dart';
+import '../widgets/medieval_card.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -27,22 +30,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     switch (type) {
       case 'registration_approved':
       case 'item_approved':
-        return Icons.check_circle;
+        return Icons.verified_user;
       case 'registration_rejected':
       case 'item_rejected':
-        return Icons.cancel;
+        return Icons.block;
       case 'auction_started':
-        return Icons.play_circle;
+        return Icons.gavel;
       case 'auction_won':
         return Icons.emoji_events;
       case 'auction_lost':
-        return Icons.sentiment_dissatisfied;
+        return Icons.thumb_down;
       case 'outbid':
         return Icons.trending_up;
       case 'payment_required':
-        return Icons.payment;
+        return Icons.request_quote;
       case 'payment_received':
-        return Icons.attach_money;
+        return Icons.check_circle_outline;
       default:
         return Icons.notifications;
     }
@@ -71,16 +74,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifikasi'),
+        title: Text('Kabar Kerajaan', style: GoogleFonts.cinzel(fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
         actions: [
           Consumer<NotificationProvider>(
             builder: (context, provider, child) {
               if (provider.unreadCount > 0) {
                 return TextButton(
                   onPressed: () => provider.markAllAsRead(),
-                  child: const Text(
-                    'Tandai Semua Dibaca',
-                    style: TextStyle(color: AppColors.white),
+                  child: Text(
+                    'Baca Semua',
+                    style: GoogleFonts.merriweather(
+                      color: AppColors.white, 
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold
+                    ),
                   ),
                 );
               }
@@ -89,72 +98,96 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ],
       ),
-      body: Consumer<NotificationProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.notifications.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: ParchmentBackground(
+        child: Consumer<NotificationProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading && provider.notifications.isEmpty) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
 
-          if (provider.notifications.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.notifications_none,
-                    size: 80,
-                    color: AppColors.textPrimary.withOpacity(0.3),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Tidak ada notifikasi',
-                    style: TextStyle(
-                      color: AppColors.textPrimary.withOpacity(0.5),
+            if (provider.notifications.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                      ),
+                      child: Icon(
+                        Icons.notifications_off_outlined,
+                        size: 64,
+                        color: AppColors.primary.withOpacity(0.5),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    Text(
+                      'Tidak Ada Kabar Terbaru',
+                      style: GoogleFonts.cinzel(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Belum ada berita dari kerajaan untuk Anda saat ini.',
+                      style: GoogleFonts.merriweather(
+                        color: AppColors.textPrimary.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () => provider.fetchNotifications(refresh: true),
+              color: AppColors.primary,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: provider.notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = provider.notifications[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _NotificationCard(
+                      notification: notification,
+                      icon: _getNotificationIcon(notification.type),
+                      iconColor: _getNotificationColor(notification.type),
+                      onTap: () {
+                        if (!notification.isRead) {
+                          provider.markAsRead(notification.id);
+                        }
+                      },
+                      onDismiss: () {
+                        provider.deleteNotification(notification.id);
+                      },
+                    ),
+                  );
+                },
               ),
             );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => provider.fetchNotifications(refresh: true),
-            child: ListView.separated(
-              itemCount: provider.notifications.length,
-              separatorBuilder: (context, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final notification = provider.notifications[index];
-                return _NotificationTile(
-                  notification: notification,
-                  icon: _getNotificationIcon(notification.type),
-                  iconColor: _getNotificationColor(notification.type),
-                  onTap: () {
-                    if (!notification.isRead) {
-                      provider.markAsRead(notification.id);
-                    }
-                    // Navigate based on notification type
-                  },
-                  onDismiss: () {
-                    provider.deleteNotification(notification.id);
-                  },
-                );
-              },
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
 }
 
-class _NotificationTile extends StatelessWidget {
+class _NotificationCard extends StatelessWidget {
   final AppNotification notification;
   final IconData icon;
   final Color iconColor;
   final VoidCallback onTap;
   final VoidCallback onDismiss;
 
-  const _NotificationTile({
+  const _NotificationCard({
     required this.notification,
     required this.icon,
     required this.iconColor,
@@ -169,57 +202,85 @@ class _NotificationTile extends StatelessWidget {
       direction: DismissDirection.endToStart,
       onDismissed: (_) => onDismiss(),
       background: Container(
-        color: AppColors.error,
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.error.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(16),
+        ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete, color: AppColors.white),
+        child: const Icon(Icons.delete_outline, color: AppColors.white, size: 28),
       ),
-      child: ListTile(
+      child: MedievalCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         onTap: onTap,
-        tileColor: notification.isRead ? null : AppColors.secondary.withOpacity(0.05),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: iconColor, size: 24),
-        ),
-        title: Text(
-          notification.title,
-          style: TextStyle(
-            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-          ),
-        ),
-        subtitle: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
-            Text(
-              notification.message,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            // Icon
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+                border: Border.all(color: iconColor.withOpacity(0.3)),
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-            const SizedBox(height: 4),
-            Text(
-              notification.timeAgo,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textPrimary.withOpacity(0.5),
+            
+            const SizedBox(width: 16),
+            
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: GoogleFonts.cinzel(
+                            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      if (!notification.isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: AppColors.secondary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    notification.message,
+                    style: GoogleFonts.merriweather(
+                      fontSize: 13,
+                      color: AppColors.textPrimary.withOpacity(0.8),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    notification.timeAgo,
+                    style: GoogleFonts.merriweather(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textPrimary.withOpacity(0.5),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        trailing: !notification.isRead
-            ? Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  shape: BoxShape.circle,
-                ),
-              )
-            : null,
       ),
     );
   }

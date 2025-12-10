@@ -10,6 +10,11 @@ import '../screens/payment_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/edit_profile_screen.dart';
+import '../screens/change_password_screen.dart';
+import '../screens/won_auctions_screen.dart';
+import '../screens/auction_list_screen.dart';
+import '../screens/my_items_screen.dart';
+import '../screens/profile_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -27,16 +32,24 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String notifications = '/notifications';
   
+  static const String changePassword = '/change-password';
+  static const String wonAuctions = '/won-auctions';
+
   static Map<String, WidgetBuilder> get routes => {
     splash: (context) => const SplashScreen(),
     login: (context) => const LoginScreen(),
     register: (context) => const RegisterScreen(),
     home: (context) => const HomeScreen(),
+    auctionList: (context) => const AuctionListScreen(),
+    myItems: (context) => const MyItemsScreen(),
     bidHistory: (context) => const BidHistoryScreen(),
+    wonAuctions: (context) => const WonAuctionsScreen(),
     submitItem: (context) => const SubmitItemScreen(),
     notifications: (context) => const NotificationsScreen(),
     settings: (context) => const SettingsScreen(),
+    profile: (context) => const ProfileScreen(),
     editProfile: (context) => const EditProfileScreen(),
+    changePassword: (context) => const ChangePasswordScreen(),
   };
   
   // For routes that need arguments

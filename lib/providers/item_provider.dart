@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 import '../services/api_service.dart';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class Item {
@@ -186,7 +187,7 @@ class ItemProvider with ChangeNotifier {
     required String description,
     required double startingPrice,
     double? minimumBidIncrement,
-    required List<File> images,
+    required List<XFile> images, // Changed from File to XFile
   }) async {
     _isLoading = true;
     _error = null;
@@ -204,28 +205,68 @@ class ItemProvider with ChangeNotifier {
       
       // Add images
       for (int i = 0; i < images.length; i++) {
-        formData.files.add(MapEntry(
-          'images[]',
-          await MultipartFile.fromFile(images[i].path),
-        ));
+        String fileName = images[i].name;
+        if (fileName.isEmpty) {
+          fileName = 'image_$i.jpg';
+        }
+
+        if (kIsWeb) {
+            final bytes = await images[i].readAsBytes();
+            formData.files.add(MapEntry(
+              'images[]',
+              MultipartFile.fromBytes(
+                bytes, 
+                filename: fileName,
+                // contentType: MediaType('image', 'jpeg'), // fallback if needed
+              ),
+            ));
+        } else {
+            formData.files.add(MapEntry(
+              'images[]',
+              await MultipartFile.fromFile(
+                images[i].path, 
+                filename: fileName,
+              ),
+            ));
+        }
       }
+      
+      print('Submitting item payload: ${formData.fields}'); 
       
       final response = await _apiService.postFormData(ApiConfig.items, formData);
       
+      print('Submit Response Status: ${response.statusCode}');
+      print('Submit Response Data: ${response.data}');
+
       if (response.data['success'] == true) {
-        // Refresh my items
         await fetchMyItems(refresh: true);
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
-        _error = response.data['message'] ?? 'Gagal mengajukan barang';
+        _error = response.data['message'] ?? 'Gagal mengajukan barang (Server Error)';
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _error = 'Gagal mengajukan barang. Silakan coba lagi.';
+      if (e is DioException) {
+         print('DioException: ${e.message}');
+         print('Response: ${e.response?.data}');
+         print('Headers: ${e.response?.headers}');
+         
+         String serverMsg = '';
+         if (e.response?.data is Map && e.response!.data['message'] != null) {
+           serverMsg = e.response!.data['message'];
+         } else if (e.response?.data is String) { // HTML sometimes
+            serverMsg = 'Terjadi kesalahan server (500)';
+         }
+         
+         _error = serverMsg.isNotEmpty ? serverMsg : 'Gagal menghubungi server: ${e.message}';
+      } else {
+         print('General Error: $e');
+         _error = 'Gagal mengajukan barang: $e';
+      }
       _isLoading = false;
       notifyListeners();
       return false;

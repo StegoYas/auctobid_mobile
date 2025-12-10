@@ -66,6 +66,49 @@ class AuctionProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  // Fetch won auctions
+  Future<void> fetchWonAuctions({bool refresh = false}) async {
+    if (refresh) {
+      _currentPage = 1;
+      _auctions = [];
+      _hasMore = true;
+    }
+    
+    if (!_hasMore && !refresh) return;
+    
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      final params = <String, dynamic>{'page': _currentPage};
+      
+      final response = await _apiService.get(ApiConfig.myWins, queryParameters: params);
+      
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as List;
+        final meta = response.data['meta'];
+        
+        final newAuctions = data.map((json) => Auction.fromJson(json)).toList();
+        
+        if (refresh) {
+          _auctions = newAuctions;
+        } else {
+          _auctions.addAll(newAuctions);
+        }
+        
+        _currentPage = meta['current_page'] + 1;
+        _lastPage = meta['last_page'];
+        _hasMore = meta['current_page'] < meta['last_page'];
+      }
+    } catch (e) {
+      _error = 'Gagal memuat lelang yang dimenangkan';
+    }
+    
+    _isLoading = false;
+    notifyListeners();
+  }
   
   // Fetch auction detail
   Future<void> fetchAuctionDetail(int auctionId) async {

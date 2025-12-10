@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart'; // for kIsWeb
 import '../config/app_theme.dart';
 import '../providers/item_provider.dart';
+import '../widgets/parchment_background.dart';
+import '../widgets/medieval_button.dart';
+import '../widgets/medieval_card.dart';
 
 class SubmitItemScreen extends StatefulWidget {
   const SubmitItemScreen({super.key});
@@ -21,7 +26,7 @@ class _SubmitItemScreenState extends State<SubmitItemScreen> {
   
   int? _selectedCategoryId;
   int? _selectedConditionId;
-  final List<File> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   final _picker = ImagePicker();
 
   @override
@@ -62,7 +67,7 @@ class _SubmitItemScreenState extends State<SubmitItemScreen> {
       setState(() {
         for (var image in pickedImages) {
           if (_selectedImages.length < 5) {
-            _selectedImages.add(File(image.path));
+            _selectedImages.add(image);
           }
         }
       });
@@ -115,7 +120,7 @@ class _SubmitItemScreenState extends State<SubmitItemScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Barang berhasil diajukan! Menunggu persetujuan admin.'),
+          content: Text('Harta berhasil diajukan! Menunggu titah admin.'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -130,320 +135,247 @@ class _SubmitItemScreenState extends State<SubmitItemScreen> {
     }
   }
 
+  InputDecoration _buildInputDecoration(String label, IconData icon, {String? prefixText}) {
+     return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.merriweather(color: AppColors.textPrimary.withOpacity(0.7)),
+      prefixIcon: Icon(icon, color: AppColors.secondary),
+      prefixText: prefixText,
+      prefixStyle: GoogleFonts.cinzel(fontWeight: FontWeight.bold, color: AppColors.primary),
+      filled: true,
+      fillColor: AppColors.white.withOpacity(0.7),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.secondary.withOpacity(0.5)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.secondary.withOpacity(0.5)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ajukan Barang'),
+        title: Text(
+          'Ajukan Harta',
+          style: GoogleFonts.cinzel(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: AppColors.primary,
+        elevation: 0,
       ),
-      body: Consumer<ItemProvider>(
-        builder: (context, provider, child) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Images
-                  Text(
-                    'Foto Barang',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Pilih 1-5 foto barang yang akan dilelang',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textPrimary.withOpacity(0.6),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  SizedBox(
-                    height: 120,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        // Add Image Button
-                        GestureDetector(
-                          onTap: _pickImages,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            margin: const EdgeInsets.only(right: 12),
-                            decoration: BoxDecoration(
-                              color: AppColors.parchment,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.secondary,
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_photo_alternate,
-                                  size: 32,
+      body: ParchmentBackground(
+        child: Consumer<ItemProvider>(
+          builder: (context, provider, child) {
+             return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Images Section
+                    MedievalCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.image_outlined, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                'VISUALISASI HARTA',
+                                style: GoogleFonts.cinzel(
+                                  fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${_selectedImages.length}/5',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.primary,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 100,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                // Add Button
+                                GestureDetector(
+                                  onTap: _pickImages,
+                                  child: Container(
+                                    width: 100,
+                                    margin: const EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: AppColors.secondary, style: BorderStyle.solid, width: 2),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo, size: 32, color: AppColors.secondary),
+                                        const SizedBox(height: 4),
+                                        Text('${_selectedImages.length}/5', style: GoogleFonts.cinzel(color: AppColors.secondary)),
+                                      ],
+                                    ),
                                   ),
                                 ),
+                                // Images
+                                ..._selectedImages.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final image = entry.value;
+                                    return Stack(
+                                      children: [
+                                        Container(
+                                          width: 100,
+                                          height: 100,
+                                          margin: const EdgeInsets.only(right: 12),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(11),
+                                            child: kIsWeb
+                                                ? Image.network(
+                                                    image.path,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (ctx, err, stack) => const Center(
+                                                      child: Icon(Icons.broken_image, size: 30, color: AppColors.error),
+                                                    ),
+                                                  )
+                                                : Image.file(
+                                                    File(image.path),
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (ctx, err, stack) => const Center(
+                                                      child: Icon(Icons.broken_image, size: 30, color: AppColors.error),
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 2,
+                                          right: 14,
+                                          child: GestureDetector(
+                                            onTap: () => _removeImage(index),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.error,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(color: Colors.white, width: 1.5),
+                                              ),
+                                              child: const Icon(Icons.close, size: 12, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                }),
                               ],
                             ),
                           ),
-                        ),
-                        
-                        // Selected Images
-                        ..._selectedImages.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final image = entry.value;
-                          return Stack(
-                            children: [
-                              Container(
-                                width: 100,
-                                height: 100,
-                                margin: const EdgeInsets.only(right: 12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  image: DecorationImage(
-                                    image: FileImage(image),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 16,
-                                child: GestureDetector(
-                                  onTap: () => _removeImage(index),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.error,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.close,
-                                      size: 16,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              if (index == 0)
-                                Positioned(
-                                  bottom: 4,
-                                  left: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.secondary,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Text(
-                                      'Utama',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Name
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Barang',
-                      prefixIcon: Icon(Icons.inventory_2_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama barang wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Category
-                  DropdownButtonFormField<int>(
-                    value: _selectedCategoryId,
-                    decoration: const InputDecoration(
-                      labelText: 'Kategori',
-                      prefixIcon: Icon(Icons.category_outlined),
-                    ),
-                    items: provider.categories.map((category) {
-                      return DropdownMenuItem(
-                        value: category.id,
-                        child: Text(category.name),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCategoryId = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Pilih kategori';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Condition
-                  DropdownButtonFormField<int>(
-                    value: _selectedConditionId,
-                    decoration: const InputDecoration(
-                      labelText: 'Kondisi',
-                      prefixIcon: Icon(Icons.verified_outlined),
-                    ),
-                    items: provider.conditions.map((condition) {
-                      return DropdownMenuItem(
-                        value: condition.id,
-                        child: Text(condition.name),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedConditionId = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Pilih kondisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Description
-                  TextFormField(
-                    controller: _descriptionController,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      labelText: 'Deskripsi',
-                      alignLabelWithHint: true,
-                      prefixIcon: Padding(
-                        padding: EdgeInsets.only(bottom: 60),
-                        child: Icon(Icons.description_outlined),
+                        ],
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Deskripsi wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Starting Price
-                  TextFormField(
-                    controller: _priceController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Harga Awal',
-                      prefixText: 'Rp ',
-                      prefixIcon: Icon(Icons.monetization_on_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Harga awal wajib diisi';
-                      }
-                      if (double.tryParse(value.replaceAll(',', '')) == null) {
-                        return 'Masukkan angka yang valid';
-                      }
-                      return null;
-                    },
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Minimum Bid Increment
-                  TextFormField(
-                    controller: _bidIncrementController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Kenaikan Bid Minimum',
-                      prefixText: 'Rp ',
-                      prefixIcon: Icon(Icons.trending_up),
-                      helperText: 'Default: Rp 10.000',
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: provider.isLoading ? null : _submitItem,
-                      child: provider.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.white,
-                              ),
-                            )
-                          : const Text('Ajukan Barang'),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Info
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, color: AppColors.secondary),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Barang akan ditinjau oleh admin sebelum dapat dilelang.',
-                            style: Theme.of(context).textTheme.bodySmall,
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Main Form
+                    MedievalCard(
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _nameController,
+                            style: GoogleFonts.cinzel(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            decoration: _buildInputDecoration('Nama Barang', Icons.inventory_2_outlined),
+                            validator: (v) => (v?.isEmpty ?? true) ? 'Wajib diisi' : null,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          
+                          DropdownButtonFormField<int>(
+                            value: _selectedCategoryId,
+                            decoration: _buildInputDecoration('Bayangan Kategori', Icons.category_outlined),
+                            items: provider.categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name, style: GoogleFonts.merriweather()))).toList(),
+                            onChanged: (v) => setState(() => _selectedCategoryId = v),
+                          ),
+                          const SizedBox(height: 16),
+
+                          DropdownButtonFormField<int>(
+                            value: _selectedConditionId,
+                            decoration: _buildInputDecoration('Kondisi Fisik', Icons.verified_outlined),
+                             items: provider.conditions.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name, style: GoogleFonts.merriweather()))).toList(),
+                            onChanged: (v) => setState(() => _selectedConditionId = v),
+                          ),
+                          const SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 4,
+                            style: GoogleFonts.merriweather(color: AppColors.textPrimary),
+                            decoration: _buildInputDecoration('Kisah & Deskripsi', Icons.description_outlined),
+                            validator: (v) => (v?.isEmpty ?? true) ? 'Wajib diisi' : null,
+                          ),
+                           const SizedBox(height: 16),
+
+                           TextFormField(
+                            controller: _priceController,
+                            keyboardType: TextInputType.number,
+                             style: GoogleFonts.cinzel(color: AppColors.primary, fontWeight: FontWeight.bold),
+                            decoration: _buildInputDecoration('Harga Pembuka', Icons.monetization_on_outlined, prefixText: 'Rp '),
+                            validator: (v) => (v?.isEmpty ?? true) ? 'Wajib diisi' : null,
+                          ),
+                           const SizedBox(height: 16),
+
+                           TextFormField(
+                            controller: _bidIncrementController,
+                            keyboardType: TextInputType.number,
+                            style: GoogleFonts.cinzel(color: AppColors.secondary, fontWeight: FontWeight.bold),
+                            decoration: _buildInputDecoration('Min. Kenaikan', Icons.trending_up, prefixText: 'Rp '),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: 24),
+
+                    // Submit
+                    Consumer<ItemProvider>(
+                      builder: (context, provider, child) {
+                         return MedievalButton(
+                          label: 'Serahkan ke Gudang',
+                          icon: Icons.send,
+                          type: MedievalButtonType.primary,
+                          isLoading: provider.isLoading,
+                          onPressed: _submitItem,
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+                    
+                    Center(
+                      child: Text(
+                        'Barang mesti diperiksa oleh Petugas Kerajaan\nsebelum dilelangkan.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.merriweather(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.textPrimary.withOpacity(0.6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

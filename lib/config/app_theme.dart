@@ -5,6 +5,7 @@ class AppColors {
   // Medieval Fantasy Theme Colors
   static const Color primary = Color(0xFF8B4513);      // Saddle Brown
   static const Color secondary = Color(0xFFD4AF37);    // Gold
+  static const Color gold = Color(0xFFD4AF37);         // Gold Alias
   static const Color background = Color(0xFFFFF8DC);   // Cornsilk
   static const Color textPrimary = Color(0xFF2F4F4F);  // Dark Slate Gray
   static const Color darkBrown = Color(0xFF5D2E0C);

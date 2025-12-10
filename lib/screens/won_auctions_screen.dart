@@ -4,23 +4,22 @@ import 'package:google_fonts/google_fonts.dart';
 import '../config/app_theme.dart';
 import '../config/routes.dart';
 import '../providers/auction_provider.dart';
-import '../widgets/auction_card.dart';
 import '../widgets/parchment_background.dart';
+import '../widgets/auction_card.dart';
 
-class AuctionListScreen extends StatefulWidget {
-  const AuctionListScreen({super.key});
+class WonAuctionsScreen extends StatefulWidget {
+  const WonAuctionsScreen({super.key});
 
   @override
-  State<AuctionListScreen> createState() => _AuctionListScreenState();
+  State<WonAuctionsScreen> createState() => _WonAuctionsScreenState();
 }
 
-class _AuctionListScreenState extends State<AuctionListScreen> {
+class _WonAuctionsScreenState extends State<WonAuctionsScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch auctions when screen initializes if needed
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AuctionProvider>(context, listen: false).fetchAuctions();
+      Provider.of<AuctionProvider>(context, listen: false).fetchWonAuctions(refresh: true);
     });
   }
 
@@ -29,20 +28,17 @@ class _AuctionListScreenState extends State<AuctionListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Daftar Lelang',
+          'Lelang Dimenangkan',
           style: GoogleFonts.cinzel(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
         elevation: 0,
-        centerTitle: true,
       ),
       body: ParchmentBackground(
         child: Consumer<AuctionProvider>(
           builder: (context, provider, child) {
             if (provider.isLoading && provider.auctions.isEmpty) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
+              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
             }
 
             if (provider.auctions.isEmpty) {
@@ -50,16 +46,22 @@ class _AuctionListScreenState extends State<AuctionListScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.gavel,
-                      size: 64,
-                      color: AppColors.textPrimary.withOpacity(0.3),
-                    ),
+                    Icon(Icons.emoji_events_outlined, size: 64, color: AppColors.textPrimary.withOpacity(0.3)),
                     const SizedBox(height: 16),
                     Text(
-                      'Tidak ada lelang tersedia saat ini',
+                      'Belum ada kemenangan',
+                      style: GoogleFonts.cinzel(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary.withOpacity(0.5),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Bertarunglah di pelelangan untuk meraih kemenangan!',
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.merriweather(
-                        color: AppColors.textPrimary.withOpacity(0.6),
+                        color: AppColors.textPrimary.withOpacity(0.5),
                       ),
                     ),
                   ],
@@ -68,7 +70,9 @@ class _AuctionListScreenState extends State<AuctionListScreen> {
             }
 
             return RefreshIndicator(
-              onRefresh: () => provider.fetchAuctions(refresh: true),
+              onRefresh: () async {
+                await provider.fetchWonAuctions(refresh: true);
+              },
               color: AppColors.primary,
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),

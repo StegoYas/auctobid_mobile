@@ -1,0 +1,18 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <filter id="paper-texture">
+   <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+   <feDiffuseLighting in="noise" lighting-color="#fdf5e6" surfaceScale="2">
+    <feDistantLight azimuth="45" elevation="60"/>
+   </feDiffuseLighting>
+  </filter>
+  <linearGradient id="parchment-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+   <stop offset="0%" stop-color="#f8f4e3"/>
+   <stop offset="50%" stop-color="#f0e6d2"/>
+   <stop offset="100%" stop-color="#e8dcb5"/>
+  </linearGradient>
+ </defs>
+ <rect width="100%" height="100%" fill="url(#parchment-gradient)"/>
+ <rect width="100%" height="100%" filter="url(#paper-texture)" opacity="0.6"/>
+ <rect width="100%" height="100%" fill="none" stroke="#2c1810" stroke-width="20" stroke-opacity="0.05" rx="10" ry="10"/>
+</svg>
