@@ -31,7 +31,7 @@ class AuctobidApp extends StatelessWidget {
         title: 'AUCTOBID',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const SplashScreen(),
+        // home: const SplashScreen(), // Removed to avoid conflict with '/' route
         routes: AppRoutes.routes,
         onGenerateRoute: AppRoutes.generateRoute,
       ),

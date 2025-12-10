@@ -1,6 +1,7 @@
 class ApiConfig {
   // Change this to your Laravel backend URL
-  static const String baseUrl = 'http://10.0.2.2:8000'; // Android emulator localhost
+  static const String baseUrl = 'http://127.0.0.1:8000'; // Localhost for Web
+  // static const String baseUrl = 'http://10.0.2.2:8000'; // Android emulator localhost
   // static const String baseUrl = 'http://localhost:8000'; // iOS simulator
   // static const String baseUrl = 'http://YOUR_IP:8000'; // Physical device
   
@@ -8,7 +9,7 @@ class ApiConfig {
   static const String apiUrl = '$baseUrl$apiVersion';
   
   // WebSocket (Reverb)
-  static const String wsHost = '10.0.2.2';
+  static const String wsHost = '127.0.0.1';
   static const int wsPort = 8080;
   
   // Endpoints

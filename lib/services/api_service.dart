@@ -36,6 +36,16 @@ class ApiService {
         return handler.next(error);
       },
     ));
+
+    // Enable Verbose Logging
+    _dio.interceptors.add(LogInterceptor(
+      request: true,
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+      error: true,
+    ));
   }
   
   // GET request
